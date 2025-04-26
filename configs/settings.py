@@ -115,7 +115,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Library",
+    "TITLE": "Task",
     "DESCRIPTION": "This is cool project",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,

@@ -10,9 +10,15 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 class BookCreateSerializer(serializers.ModelSerializer):
+    author = serializers.IntegerField()
+    genre = serializers.CharField()
+    cover = serializers.ImageField(required=False)
+
     class Meta:
         model = Book
         fields = [
+            "author",
+            "genre",
             "title",
             "description",
             "length",
@@ -41,9 +47,21 @@ class AuthorCreateSerializer(serializers.ModelSerializer):
         extra_kwargs = {"id": {"read_only": True}}
 
 
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "birth_date",
+            "death_date",
+        ]
+
+
 class BookResponseSerializer(serializers.ModelSerializer):
-    author = AuthorCreateSerializer()
-    genre = serializers.CharField(source="genre.name")
+    author = AuthorSerializer()
+    genre = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
@@ -61,3 +79,16 @@ class BookResponseSerializer(serializers.ModelSerializer):
             "discount",
             "cover",
         ]
+
+    def get_genre(self, obj):
+        if obj.genre:
+            return obj.genre.name
+        return None
+
+
+class RateBookSerializer(serializers.Serializer):
+    rating = serializers.FloatField()
+
+
+class DeleteSerializer(serializers.Serializer):
+    pass
