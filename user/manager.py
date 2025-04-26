@@ -1,5 +1,11 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.db.models import TextChoices
+
+
+class Role(TextChoices):
+    USER = "user", "User"
+    ADMIN = "admin", "Admin"
 
 
 class UserManager(BaseUserManager):
@@ -19,6 +25,7 @@ class UserManager(BaseUserManager):
             raise ValueError(_("Email must be set!"))
         user = self.create_user(email, password, **kwargs)
         user.is_superuser = True
+        user.role = Role.ADMIN
         user.is_staff = True
         user.save()
 

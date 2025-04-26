@@ -16,10 +16,13 @@ from user.models import User
 
 
 class Author(Model):
-    full_name = CharField(max_length=255)
+    first_name = CharField(max_length=255)
+    last_name = CharField(max_length=255)
+    birth_date = DateField()
+    death_date = DateField(null=True)
 
     def __str__(self):
-        return self.full_name
+        return f"{self.first_name} {self.last_name}"
 
 
 class Genre(Model):
@@ -35,11 +38,11 @@ class Book(Model):
     title = CharField(max_length=255)
     description = TextField(null=True)
     length = IntegerField()
-    published_date = IntegerField()
+    published_date = DateField()
     created_date = DateField(default=date.today)
     copies_sold = IntegerField(default=0)
-    price = IntegerField()
-    discount = IntegerField(default=0, max=100)
+    price = DecimalField(max_digits=6, decimal_places=2)
+    discount = IntegerField(default=0)
     cover = ImageField(upload_to="book_covers/")
 
     def __str__(self):
