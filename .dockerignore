@@ -1,0 +1,10 @@
+Pipfile*
+static/
+media/
+.env
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+Pipfile*

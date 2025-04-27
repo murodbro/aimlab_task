@@ -26,19 +26,19 @@ class UserSignupApiView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            {
-                "status": "success",
+        user = serializer.save()
+
+        response_data = {
+            "status": "success",
+            "data": {
                 "user": {
-                    "id": serializer.instance.id,
-                    "name": serializer.instance.name,
-                    "email": serializer.instance.email,
-                    "password_set": True,
-                },
+                    "id": user.id,
+                    "name": user.name,
+                    "email": user.email,
+                }
             },
-            status=status.HTTP_201_CREATED,
-        )
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 # API to Login a User
@@ -52,28 +52,10 @@ class UserLoginApiView(APIView):
     authentication_classes = []
 
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if not email or not password:
-            return Response({"error": "Email and password required."}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.filter(email=email).first()
-        if not user:
-            return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not user.check_password(password):
-            return Response(
-                {
-                    "field_errors": {
-                        "email": "Incorrect credentials",
-                        "password": "Incorrect credentials",
-                    },
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        refresh = RefreshToken.for_user(user)
+        refresh = RefreshToken.for_user(serializer.user)
 
         return Response(
             {"refresh": str(refresh), "access": str(refresh.access_token)},

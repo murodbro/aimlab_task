@@ -21,6 +21,19 @@ class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
+    def validate_email(self, value):
+        user = User.objects.filter(email=value).first()
+        if not user:
+            raise serializers.ValidationError("User not found.")
+        self.user = user
+        return value
+
+    def validate(self, data):
+        password = data.get("password")
+        if not self.user.check_password(password):
+            raise serializers.ValidationError("Incorrect credentials")
+        return data
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

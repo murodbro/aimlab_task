@@ -1,17 +1,36 @@
 from rest_framework import serializers
 
-from library.models import Author, Book
+from library.models import Author, Book, Genre
 
 
 class BookSerializer(serializers.ModelSerializer):
+    genre = serializers.SerializerMethodField()
+
     class Meta:
         model = Book
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "description",
+            "genre",
+            "length",
+            "published_date",
+            "created_date",
+            "copies_sold",
+            "price",
+            "discount",
+            "cover",
+        ]
+
+    def get_genre(self, obj):
+        if obj.genre:
+            return obj.genre.name
+        return None
 
 
 class BookCreateSerializer(serializers.ModelSerializer):
     author = serializers.IntegerField()
-    genre = serializers.CharField()
+    genre = serializers.IntegerField()
     cover = serializers.ImageField(required=False)
 
     class Meta:
@@ -29,6 +48,16 @@ class BookCreateSerializer(serializers.ModelSerializer):
             "discount",
             "cover",
         ]
+
+    def validate_author(self, value):
+        if not Author.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Author not found.")
+        return value
+
+    def validate_genre(self, value):
+        if not Genre.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Genre not found.")
+        return value
 
 
 class AuthorCreateSerializer(serializers.ModelSerializer):

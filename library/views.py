@@ -3,8 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, DestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from library.models import Author, Book, Genre, Rating
 from library.serializers import (
@@ -68,19 +67,8 @@ class AuthorDetailApiView(RetrieveUpdateDestroyAPIView):
 @extend_schema(
     tags=["Book"],
     description="Create a new book with optional cover image upload",
-    request={
-        "multipart/form-data": BookCreateSerializer,
-    },
+    request=BookCreateSerializer,
     responses={201: BookResponseSerializer},
-    parameters=[
-        OpenApiParameter(
-            name="cover",
-            type=OpenApiTypes.BINARY,
-            location="form",
-            description="Book cover image file",
-            required=False,
-        ),
-    ],
 )
 class CreateBookApiView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -90,16 +78,8 @@ class CreateBookApiView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        author_id = serializer.validated_data.pop("author")
-        genre_name = serializer.validated_data.pop("genre")
-
-        author = Author.objects.filter(id=author_id).first()
-        if not author:
-            return Response({"error": "Author not found"}, status=status.HTTP_400_BAD_REQUEST)
-
-        genre, _ = Genre.objects.get_or_create(name=genre_name)
-        # if not genre:
-        #     return Response({"error": "Genre not found"}, status=status.HTTP_400_BAD_REQUEST)
+        author = Author.objects.get(id=serializer.validated_data.pop("author"))
+        genre = Genre.objects.get(id=serializer.validated_data.pop("genre"))
 
         book = Book.objects.create(
             author=author,
