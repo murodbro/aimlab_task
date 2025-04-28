@@ -11,10 +11,10 @@ from library.views import (
 
 
 urlpatterns = [
-    path("authors/", view=CreateListAuthorApiView.as_view()),
-    path("books/", view=CreateBookApiView.as_view()),
-    path("authors/<int:id>/", view=AuthorDetailApiView.as_view()),
-    path("books/<int:id>/", view=BookDetailsApiView.as_view()),
-    path("genres/<int:id>/", view=DeleteGenreApiView.as_view()),
-    path("books/<int:id>/rate/", view=RateBookApiView.as_view()),
+    path("authors/", view=CreateListAuthorApiView.as_view(), name="create_author"),
+    path("books/", view=CreateBookApiView.as_view(), name="create_book"),
+    path("authors/<int:id>/", view=AuthorDetailApiView.as_view(), name="author_detail"),
+    path("books/<int:id>/", view=BookDetailsApiView.as_view(), name="book_detail"),
+    path("genres/<int:id>/", view=DeleteGenreApiView.as_view(), name="delete_genre"),
+    path("books/<int:id>/rate/", view=RateBookApiView.as_view(), name="rate_book"),
 ]
